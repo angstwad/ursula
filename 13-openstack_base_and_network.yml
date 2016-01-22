@@ -1,0 +1,15 @@
+---
+- name: openstack base setup
+  hosts: controller
+  roles:
+    - role: 'openstack-setup'
+      tags: ['openstack-setup', 'openstack', 'setup']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: openstack network setup
+  hosts: network
+  roles:
+    - role: 'openstack-network'
+      tags: ['openstack', 'setup', 'openstack-network']
+      when: neutron.enable_external_interface|bool
+  environment: "{{ env_vars|default({}) }}"

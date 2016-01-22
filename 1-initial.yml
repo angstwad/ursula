@@ -1,0 +1,177 @@
+---
+- name: common role for all hosts
+  hosts: all
+  gather_facts: force
+  roles:
+    - role: common
+      tags: ['common','common-base']
+    - role: manage-disks
+      tags: ['common', 'manage-disks']
+      when: manage_disks.enabled|default('False')|bool
+    - role: collectd-client
+      tags: ['collectd-client','collectd']
+      when: collectd.enabled|default('False')|bool
+  environment: "{{ env_vars|default({}) }}"
+
+- name: security and errata
+  hosts: all
+  roles:
+    - role: security_errata
+      tags: ['common', 'security', 'errata']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: install logging and dependencies
+  hosts: all
+  roles:
+    - role: logging
+      tags: ['common', 'logging']
+      when: logging.enabled|default('True')|bool
+  environment: "{{ env_vars|default({}) }}"
+
+- name: setup IPv6 router advertisements
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: ipv6ra
+      tags: ['infra']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: rabbitmq used by openstack
+  gather_facts: force
+  hosts: controller
+  serial: 1 # serial because clustering
+  roles:
+    - role: rabbitmq
+      tags: ['infra', 'rabbitmq']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: install common percona components and gather facts
+  gather_facts: force
+  hosts: db
+  roles:
+    - role: percona-common
+      tags: ['infra', 'percona', 'percona-facts']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: install percona on primary
+  gather_facts: force
+  hosts: db[0]
+  vars:
+    should_bootstrap_as_primary: True
+  roles:
+    - role: percona-server
+      tags: ['infra', 'percona', 'percona-primary']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: install percona on secondaries
+  gather_facts: force
+  hosts: db:!db[0]
+  vars:
+    should_bootstrap_as_primary: False
+  roles:
+    - role: percona-server
+      tags: ['infra', 'percona', 'percona-secondary']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: install percona arbiter
+  gather_facts: force
+  hosts: db_arbiter
+  roles:
+    - role: percona-common
+      tags: ['infra', 'percona']
+
+    - role: percona-arbiter
+      tags: ['infra', 'percona']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: configure percona backups on primary
+  hosts: db[0]
+  roles:
+    - role: percona-backup
+      tags: ['infra', 'percona']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: install mongodb server
+  gather_facts: force
+  hosts: mongo_db
+  roles:
+    - role: mongodb-server
+      tags: ['mongodb', 'mongodb-server']
+      when: ceilometer.enabled|bool
+
+- name: install mongodb arbiter
+  gather_facts: force
+  hosts: mongo_arbiter
+  roles:
+    - role: mongodb-arbiter
+      tags: ['mongodb', 'mongodb-arbiter']
+      when: ceilometer.enabled|bool
+
+- name: memcached for keystone and horizon
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: memcached
+      tags: ['infra']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: controller haproxy
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: haproxy
+      haproxy_type: openstack
+      tags: ['haproxy', 'infra']
+      when: haproxy.enabled|bool
+  environment: "{{ env_vars|default({}) }}"
+
+- name: iptables
+  hosts: network
+  roles:
+    - role: iptables
+      tags: ['iptables', 'infra']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: ceph monitors
+  hosts: ceph_monitors
+  roles:
+    - role: ceph-monitor
+      tags: ['ceph', 'ceph-monitor']
+
+- name: ceph osds
+  gather_facts: force
+  hosts: ceph_osds
+  roles:
+    - role: ceph-osd
+      tags: ['ceph', 'ceph-osd']
+
+# OPENSTACK SERVICES
+- name: openstack client tools
+  hosts: all
+  roles:
+    - role: client
+      tags: ['openstack', 'client']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: keystone code and config
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: openstack-database
+      database_name: keystone
+      tags: ['openstack', 'keystone', 'control']
+    - role: keystone
+      tags: ['openstack', 'keystone', 'control']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: keystone setup
+  hosts: controller[0]
+  vars_files:
+    - roles/keystone/defaults/main.yml
+
+  roles:
+    - role: keystone-setup
+      keystone_configured: false
+      tags: ['openstack', 'setup', 'keystone-setup']
+      #when: not keystone_configured
+  environment: "{{ env_vars|default({}) }}"

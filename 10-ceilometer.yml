@@ -1,0 +1,16 @@
+---
+- name: ceilometer control plane
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: ceilometer-control
+      tags: ['openstack', 'ceilometer', 'control']
+      when: ceilometer.enabled|bool
+
+- name: ceilometer data plane
+  gather_facts: force
+  hosts: compute
+  roles:
+    - role: ceilometer-data
+      tags: ['openstack', 'ceilometer', 'data']
+      when: ceilometer.enabled|bool

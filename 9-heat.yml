@@ -1,0 +1,13 @@
+---
+- name: heat code and config
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: openstack-database
+      database_name: heat
+      tags: ['openstack', 'heat', 'control']
+      when: heat.enabled|bool
+    - role: heat
+      tags: ['openstack', 'heat', 'control']
+      when: heat.enabled|bool
+  environment: "{{ env_vars|default({}) }}"

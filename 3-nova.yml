@@ -1,0 +1,17 @@
+---
+- name: nova control plane
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: nova-control
+      tags: ['openstack', 'nova', 'control']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: nova data plane
+  gather_facts: force
+  hosts: compute
+  roles:
+    - role: nova-data
+      tags: ['openstack', 'nova', 'data']
+      when: not ironic.enabled|bool
+  environment: "{{ env_vars|default({}) }}"

@@ -1,0 +1,11 @@
+---
+- name: glance code and config
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: openstack-database
+      database_name: glance
+      tags: ['openstack', 'glance', 'control', 'ceph']
+    - role: glance
+      tags: ['openstack', 'glance', 'control', 'ceph']
+  environment: "{{ env_vars|default({}) }}"

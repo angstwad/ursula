@@ -1,0 +1,7 @@
+---
+- name: horizon code and config
+  hosts: controller
+  roles:
+    - role: horizon
+      tags: ['openstack', 'horizon', 'control']
+  environment: "{{ env_vars|default({}) }}"

@@ -1,0 +1,23 @@
+---
+- name: neutron control plane
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: neutron-control
+      tags: ['openstack', 'neutron', 'control']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: neutron core data plane
+  gather_facts: force
+  hosts: compute:network
+  roles:
+    - role: neutron-data
+      tags: ['openstack', 'neutron', 'data']
+  environment: "{{ env_vars|default({}) }}"
+
+- name: neutron network services data plane
+  hosts: network
+  roles:
+    - role: neutron-data-network
+      tags: ['openstack', 'neutron', 'data']
+  environment: "{{ env_vars|default({}) }}"

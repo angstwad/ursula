@@ -1,0 +1,17 @@
+---
+- name: ironic control plane
+  gather_facts: force
+  hosts: controller
+  roles:
+    - role: ironic-control
+      tags: ['openstack', 'ironic', 'control']
+      when: ironic.enabled|bool
+  environment: "{{ env_vars|default({}) }}"
+
+- name: ironic data plane
+  hosts: controller
+  roles:
+    - role: ironic-data
+      tags: ['openstack', 'ironic', 'data']
+      when: ironic.enabled|bool
+  environment: "{{ env_vars|default({}) }}"
