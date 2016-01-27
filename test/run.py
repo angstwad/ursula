@@ -46,13 +46,14 @@ TEST_PLAY = 'playbooks/tests/tasks/main.yml'
 CLEANUP_PLAY = 'playbooks/tests/tasks/cleanup.yml'
 UPGRADE_PLAY = 'upgrade.yml'
 
-
 lock = multiprocessing.Lock()
 
 
 def popen(exec_str, stderr=subprocess.STDOUT, stdout=subprocess.PIPE,
           wait=True):
-    process = subprocess.Popen(exec_str, stderr=stderr, stdout=stdout)
+    process = subprocess.Popen(
+        exec_str, stderr=stderr, stdout=stdout, env=os.environ.copy()
+    )
     exitcode = None
     if wait:
         exitcode = process.wait()
