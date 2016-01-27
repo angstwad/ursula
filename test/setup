@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo
+echo ******************** running test/setup ********************
+echo
+
 # if in jenkins, make the venv from the workspace and build ID
 # to allow concurrent runs.
 if [[ "$CI" == "jenkins" ]]; then
@@ -144,3 +148,10 @@ ursula "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/pre-deploy.yml -u ${LOGIN
 
 ring_bell
 echo "vms are up: ${VMS} !!"
+echo
+echo
+echo
+
+echo
+echo ******************** complete test/setup ********************
+echo
