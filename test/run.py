@@ -72,12 +72,14 @@ def ursula_single(playbook, args):
 
     if args.verbose:
         print("Executing: '%s'" % exec_str)
+        sys.stdout.flush()
 
     process, exitcode = popen(shlex.split(exec_str), stderr=None, stdout=None)
 
     if exitcode is not 0:
         print('\nPlaybook %s exited with errors, exit code: '
               '%s\n' % (playbook, exitcode), file=sys.stderr)
+        sys.stderr.flush()
 
 
 def ursula_parallel(process_name, playbook, args):
@@ -93,39 +95,51 @@ def ursula_parallel(process_name, playbook, args):
     if args.verbose:
         with lock:
             print("Executing: '%s'" % exec_str)
+            sys.stdout.flush()
 
     with lock:
-        print("Running playbook '%s' in process %s." % (playbook, process_name))
+        print(
+            "Running playbook '%s' in process %s." % (playbook, process_name)
+        )
+        sys.stdout.flush()
 
     process, exitcode = popen(shlex.split(exec_str))
     if exitcode is not 0:
         with lock:
             print('\nPlaybook %s exited with errors, exit code: '
                   '%s\n' % (playbook, exitcode), file=sys.stderr)
+            sys.stderr.flush()
+            sys.exit(exitcode)
 
     with lock:
         print(process.stdout.read())
+        sys.stdout.flush()
 
 
 def run_parallel(args):
     if args.verbose:
         print('Running playbooks in parallel.')
+        sys.stdout.flush()
 
     num_procs = args.workers if args.workers else len(PLAYS_PARALLEL)
     pool = multiprocessing.Pool(processes=num_procs)
     for idx, playbook in enumerate(PLAYS_PARALLEL):
         if args.verbose:
             print("Adding  '%s' to process pool." % playbook)
+            sys.stdout.flush()
 
         pool.apply_async(ursula_parallel, args=[idx, playbook, args])
 
     if args.verbose:
         print('All playbooks added to process pool.')
+        sys.stdout.flush()
 
     pool.close()
 
     if args.verbose:
         print('Waiting for processes to complete...')
+        sys.stdout.flush()
+
     pool.join()
 
 
