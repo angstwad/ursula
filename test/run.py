@@ -46,15 +46,8 @@ TEST_PLAY = 'playbooks/tests/tasks/main.yml'
 CLEANUP_PLAY = 'playbooks/tests/tasks/cleanup.yml'
 UPGRADE_PLAY = 'upgrade.yml'
 
+
 lock = multiprocessing.Lock()
-
-
-def get_login_user():
-    login_user = os.environ.get('LOGIN_USER')
-    if not login_user:
-        print('\nEnv var LOGIN_USER not set!\n', file=sys.stderr)
-        sys.exit(1)
-    return login_user
 
 
 def popen(exec_str, stderr=subprocess.STDOUT, stdout=subprocess.PIPE,
@@ -67,13 +60,12 @@ def popen(exec_str, stderr=subprocess.STDOUT, stdout=subprocess.PIPE,
 
 
 def ursula_single(playbook, args):
-    login_user = get_login_user()
     exec_str = (
         'ursula {environment} {playbook} -u {login_user} --sudo {extra_args}'
     ).format(
         environment=args.env,
         playbook=playbook,
-        login_user=login_user,
+        login_user=args.login_user,
         extra_args=args.extra_ansible_args
     ).strip()
 
@@ -88,13 +80,12 @@ def ursula_single(playbook, args):
 
 
 def ursula_parallel(process_name, playbook, args):
-    login_user = get_login_user()
     exec_str = (
         'ursula {environment} {playbook} -u {login_user} --sudo {extra_args}'
     ).format(
         environment=args.env,
         playbook=playbook,
-        login_user=login_user,
+        login_user=args.login_user,
         extra_args=args.extra_ansible_args
     ).strip()
 
@@ -174,6 +165,7 @@ def parse_args():
     group.add_argument('--cleanup', action='store_true')
     group.add_argument('--upgrade', action='store_true')
     parser.add_argument('--env', '--environment', default='envs/test')
+    parser.add_argument('--login-user', default='ubuntu')
     parser.add_argument('-w', '--workers', type=int, default=0)
     parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument('extra_ansible_args', nargs='?', default='')
