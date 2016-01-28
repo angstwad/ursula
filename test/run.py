@@ -20,11 +20,14 @@ from __future__ import print_function
 
 import os
 import sys
+import time
 import shlex
+import datetime
 import subprocess
 import multiprocessing
 
 from argparse import ArgumentParser
+from contextlib import contextmanager
 
 
 PLAYS_INITIAL = ['1-initial.yml']
@@ -47,6 +50,21 @@ CLEANUP_PLAY = 'playbooks/tests/tasks/cleanup.yml'
 UPGRADE_PLAY = 'upgrade.yml'
 
 lock = multiprocessing.Lock()
+
+
+@contextmanager
+def timer(name=None):
+    start = time.time()
+    yield
+    end = time.time()
+
+    if name:
+        timestamp = datetime.timedelta(seconds=int(end - start))
+        with lock:
+            print(
+                "\nTask '%s' completed in %s (hh:mm:ss).\n" % (name, timestamp)
+            )
+            sys.stdout.flush()
 
 
 def popen(exec_str, stderr=subprocess.STDOUT, stdout=subprocess.PIPE,
@@ -106,13 +124,15 @@ def ursula_parallel(process_name, playbook, args):
     process, exitcode = popen(shlex.split(exec_str))
     if exitcode is not 0:
         with lock:
-            print('\nPlaybook %s exited with errors, exit code: '
-                  '%s\n' % (playbook, exitcode), file=sys.stderr)
+            print("\nPlaybook '%s' exited with errors, exit code: "
+                  "%s\n" % (playbook, exitcode), file=sys.stderr)
             sys.stderr.flush()
             sys.exit(exitcode)
 
     with lock:
         print(process.stdout.read())
+        if args.verbose and exitcode is 0:
+            print("\nPlaybook '%s' complete.\n")
         sys.stdout.flush()
 
 
@@ -145,12 +165,15 @@ def run_parallel(args):
 
 def run_deploy(args):
     for play in PLAYS_INITIAL:
-        ursula_single(play, args)
+        with timer('serial play %s' % play):
+            ursula_single(play, args)
 
-    run_parallel(args)
+    with timer('parallel Ursula deploy'):
+        run_parallel(args)
 
     for play in PLAYS_FINAL:
-        ursula_single(play, args)
+        with timer('serial play %s' % play):
+            ursula_single(play, args)
 
 
 def dispatch(args):
@@ -193,4 +216,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    with timer('main parallel test runner'):
+        main()
