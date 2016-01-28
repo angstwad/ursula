@@ -133,7 +133,7 @@ def ursula_parallel(process_name, playbook, args):
     with lock:
         print(process.stdout.read())
         if args.verbose and exitcode is 0:
-            print("\nPlaybook '%s' complete.\n")
+            print("\nPlaybook '%s' complete.\n" % playbook)
         sys.stdout.flush()
 
     sys.exit(exitcode)
