@@ -99,6 +99,8 @@ def ursula_single(playbook, args):
               '%s\n' % (playbook, exitcode), file=sys.stderr)
         sys.stderr.flush()
 
+    return exitcode
+
 
 def ursula_parallel(process_name, playbook, args):
     exec_str = (
@@ -127,13 +129,14 @@ def ursula_parallel(process_name, playbook, args):
             print("\nPlaybook '%s' exited with errors, exit code: "
                   "%s\n" % (playbook, exitcode), file=sys.stderr)
             sys.stderr.flush()
-            sys.exit(exitcode)
 
     with lock:
         print(process.stdout.read())
         if args.verbose and exitcode is 0:
             print("\nPlaybook '%s' complete.\n")
         sys.stdout.flush()
+
+    sys.exit(exitcode)
 
 
 def run_parallel(args):
@@ -161,6 +164,7 @@ def run_parallel(args):
         sys.stdout.flush()
 
     pool.join()
+
 
 
 def run_deploy(args):
