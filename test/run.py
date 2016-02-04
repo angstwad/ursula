@@ -123,8 +123,18 @@ def ursula_parallel(process_name, playbook, args):
         )
         sys.stdout.flush()
 
-    process, exitcode = popen(shlex.split(exec_str))
-    if exitcode is not 0:
+    logfile = '%s.log' % playbook.split('.')[0]
+    process, exitcode = popen(shlex.split(exec_str), wait=False)
+
+    f = open(logfile, 'wb')
+    while True:
+        f.wite(process.stdout.read())
+        if process.poll() is not None:
+            break
+        time.sleep(5)
+    f.close()
+
+    if process.returncode is not 0:
         with lock:
             print("\nPlaybook '%s' exited with errors, exit code: "
                   "%s\n" % (playbook, exitcode), file=sys.stderr)
@@ -164,7 +174,6 @@ def run_parallel(args):
         sys.stdout.flush()
 
     pool.join()
-
 
 
 def run_deploy(args):
