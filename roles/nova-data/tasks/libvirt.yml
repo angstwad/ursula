@@ -18,6 +18,7 @@
     - pkg-config
     - genisoimage
     - util-linux
+    - gnutls-bin
   notify: restart nova services
   when: ansible_distribution_version == "12.04"
 
@@ -33,6 +34,7 @@
     - pkg-config
     - genisoimage
     - util-linux
+    - gnutls-bin
   notify: restart nova services
   when: ansible_distribution_version == "14.04"
 
@@ -56,29 +58,124 @@
   notify: restart nova services
   when: openstack_install_method == 'source'
 
+- name: make pki paths
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: kvm
+  with_items:
+    - /etc/pki/CA
+    - /etc/pki/libvirt/private
+
+- name: install CA file
+  template:
+    src: etc/pki/CA/cacert.pem
+    dest: /etc/pki/CA/cacert.pem
+    owner: root
+    group: kvm
+    mode: 0644
+  register: ca_install
+  notify:
+    - set libvirt pki dir owner
+    - set libvirt pki perms
+
+- name: upload CA key
+  template:
+    src: etc/pki/CA/libvirt_cacert.key
+    dest: /etc/pki/CA/libvirt_cacert.key
+  register: ca_key_install
+
+- name: upload server certificate template
+  template:
+    src: etc/pki/server-cert-template
+    dest: /etc/pki/server-cert-template
+  register: ca_template
+
+- name: create server cert private key
+  shell: "certtool --generate-privkey > /etc/pki/libvirt/private/serverkey.pem"
+  when: ca_install|changed or ca_key_install|changed or ca_template|changed
+  notify:
+    - set libvirt pki dir owner
+    - set libvirt pki perms
+
+- name: create server cert
+  command: "certtool --generate-certificate
+           --template /etc/pki/server-cert-template
+           --load-privkey /etc/pki/libvirt/private/serverkey.pem
+           --load-ca-certificate /etc/pki/CA/cacert.pem
+           --load-ca-privkey /etc/pki/CA/libvirt_cacert.key
+           --outfile /etc/pki/libvirt/servercert.pem"
+  when: ca_install|changed or ca_key_install|changed or ca_template|changed
+  notify:
+    - set libvirt pki dir owner
+    - set libvirt pki perms
+    - restart libvirt-bin
+
+- name: upload client certificate template
+  template:
+    src: etc/pki/client-cert-template
+    dest: /etc/pki/client-cert-template
+  register: client_template
+
+- name: create client private key
+  shell: "certtool --generate-privkey > /etc/pki/libvirt/private/clientkey.pem"
+  when: client_template|changed
+  notify:
+    - set libvirt pki dir owner
+    - set libvirt pki perms
+
+- name: create client cert
+  command: "certtool --generate-certificate
+           --template /etc/pki/client-cert-template
+           --load-privkey /etc/pki/libvirt/private/clientkey.pem
+           --load-ca-certificate /etc/pki/CA/cacert.pem
+           --load-ca-privkey /etc/pki/CA/libvirt_cacert.key
+           --outfile /etc/pki/libvirt/clientcert.pem"
+  when: client_template|changed
+  notify:
+    - set libvirt pki dir owner
+    - set libvirt pki perms
+    - restart libvirt-bin
+
 - name: update various lines in libvirtd.conf
-  lineinfile: dest=/etc/libvirt/libvirtd.conf regexp="{{ item.value.regexp }}"
-              line="{{ item.value.line }}"
+  lineinfile:
+    dest: /etc/libvirt/libvirtd.conf
+    regexp: "{{ item.value.regexp }}"
+    line: "{{ item.value.line }}"
   with_dict:
-    ltcp:
+    listen_tcp:
       regexp: '^listen_tcp\s*='
       line: "listen_tcp = 1"
-    ltls:
+    listen_tls:
       regexp: '^listen_tls\s*='
-      line: "listen_tls = 0"
-    atcp:
+      line: "listen_tls = 1"
+    auth_tcp:
       regexp: '^auth_tcp\s*='
       line: 'auth_tcp = \"none\"'
+    auth_tls:
+      regexp: '^auth_tls\s*='
+      line: 'auth_tls = \"none\"'
+    no_verify_cert:
+      regexp: '^tls_no_verify_certificate\s*='
+      line: 'tls_no_verify_certificate = 1'
+    no_verify_ip:
+      regexp: '^tls_no_verify_address\s*='
+      line: 'tls_no_verify_address = 1'
   notify: restart libvirt-bin
 
 - name: update libvirtd default
-  lineinfile: dest=/etc/default/libvirt-bin regexp="^libvirtd_opts\s*="
-              line="libvirtd_opts=\"-d -l\""
+  lineinfile:
+    dest: /etc/default/libvirt-bin
+    regexp: '^libvirtd_opts\s*='
+    line: 'libvirtd_opts=\"-d -l\"'
   notify: restart libvirt-bin
 
 - name: update qemu migration option
-  lineinfile: dest=/etc/libvirt/qemu.conf regexp="^allow_incoming_qemukvm\s*="
-              line="allow_incoming_qemukvm = 1"
+  lineinfile:
+    dest: /etc/libvirt/qemu.conf
+    regexp: '^allow_incoming_qemukvm\s*='
+    line: 'allow_incoming_qemukvm = 1'
   notify: restart libvirt-bin
 
 - name: ensure kvm is supported by cpu and enabled in bios

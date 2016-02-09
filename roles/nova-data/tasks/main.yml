@@ -4,6 +4,8 @@
 
 - include: libvirt.yml
   when: nova.compute_driver == "nova.virt.libvirt.LibvirtDriver"
+  tags:
+    - libvirt
 
 - include: docker.yml
   when: nova.compute_driver == "novadocker.virt.docker.DockerDriver"
@@ -54,4 +56,3 @@
 
 - include: monitoring.yml tags=monitoring,common
   when: monitoring.enabled|default('True')|bool
-

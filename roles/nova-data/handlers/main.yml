@@ -9,3 +9,22 @@
   service: name={{ item }} state=restarted must_exist=false
   with_items:
     - nova-compute
+
+- name: set libvirt pki dir owner
+  file:
+    dest: /etc/pki/libvirt
+    recurse: yes
+    owner: root
+    group: kvm
+
+- name: set libvirt pki perms
+  file:
+    dest: "{{ item.key }}"
+    mode: "{{ item.value }}"
+  with_dict:
+    /etc/pki/libvirt: "0755"
+    /etc/pki/libvirt/private: "0750"
+    /etc/pki/libvirt/clientcert.pem: "0400"
+    /etc/pki/libvirt/servercert.pem: "0440"
+    /etc/pki/libvirt/private/clientkey.pem: "0644"
+    /etc/pki/libvirt/private/serverkey.pem: "0600"

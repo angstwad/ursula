@@ -1,0 +1,8 @@
+country = {{ libvirt_ssl.country }}
+state = {{ libvirt_ssl.state }}
+locality = {{ libvirt_ssl.locality }}
+organization = {{ libvirt_ssl.org_name }}
+cn = {{ hostvars[inventory_hostname].ansible_nodename }}
+tls_www_client
+encryption_key
+signing_key

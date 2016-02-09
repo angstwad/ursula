@@ -1,0 +1,5 @@
+organization = {{ libvirt_ssl.org_name }}
+cn = {{ hostvars[inventory_hostname].ansible_nodename }}
+tls_www_server
+encryption_key
+signing_key

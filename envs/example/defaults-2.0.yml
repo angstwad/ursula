@@ -542,6 +542,66 @@ ssl:
   # remove this line out if using a real CA supplied cert
   cafile: /usr/local/share/ca-certificates/{{ endpoints.main }}.crt
 
+libvirt_ssl:
+  org_name: ursula
+  country: US
+  state: unknown
+  locality: unknown
+  ca: |
+    -----BEGIN CERTIFICATE-----
+    MIIDQzCCAfugAwIBAgIEVsdNaTANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDEwZ1
+    cnN1bGEwHhcNMTYwMjE5MTcxNDE3WhcNMTcwMjE4MTcxNDE3WjARMQ8wDQYDVQQD
+    EwZ1cnN1bGEwggFSMA0GCSqGSIb3DQEBAQUAA4IBPwAwggE6AoIBMQCwcCMQVOxz
+    /MzsGTBqEQo/ShUDdxE2xlhv/k0pFjzRdKOSCOe+xtrrWT3adsHoXMvXtIGTzs/u
+    9EuQJEAKeSZi2sH4TPbp2SeyEvt1bosmFMzJhj8AaM8ERHqTGBsL9DsXakeOYK5L
+    3s+dtkPx7j5kFmCkq+d/qipwtoVrwhJ/yt1A7w/4EPGYO3XYG04BL9gE/J2lcruG
+    jRgd0ZbXlCKJ9IJdPn7gVO0z6ER/ND/dCK/XqeM6+xKD+8WaYa0Lco2E/2t2VFW5
+    nMPyv4aBM8PCgPRPAwb5FyO73PLCGUJc8XwdtNnYahQRlHemGqisjfFODtC89Uuw
+    eYF6Ha/JoyACWXRFiCy3HZMWCYy9cOowui/ugTezUg42KDFrrwVjoOrATCIQZCo/
+    pVTtkGAQkudHAgMBAAGjQzBBMA8GA1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUD
+    AwcEADAdBgNVHQ4EFgQUfMeXMxYE4Tql609hkrbvZNHHWxowDQYJKoZIhvcNAQEL
+    BQADggExAHHLuDl7283UkbX9mjkcQaWMd5WdejmiyaG0fcn3s1kaD4mQMcX5t9fa
+    4bTdMTic4HnAthpTUUJgwXDgAO7OhPviFDWXnZdzeN8sv1e6QMVeu+ZHy2RqKm/z
+    urlnXVWe/xGpo6IVw/6IsmDzLzj1tYoltIT7SEOZwcurL4hSncjYudGygDC8h3Y1
+    oL3+VmTiuxuG31KVVsuHrUKTwwSHoKzVq7O21n+CzX2WaDG5BCjDJF1jPhHX/P0e
+    iTFo3kWHwKua6gBT7L0Yl0LY5Hl39Nco2bzFLVHQzKsx5Iixix0VYlSabMcor/y9
+    nFRdy+H0HxL/i5/AAPBDOp62OHaSmXe2BUQmZLK1NdPeUorlSGgwvPvJaDAJAXUI
+    S9U3PWzA09bayj/PQQLXyM1aAsQF7wI=
+    -----END CERTIFICATE-----
+  key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    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
+    SUIhM8iauymy5vD1k1Kg
+    -----END RSA PRIVATE KEY-----
+
 openstack_setup:
   add_users: True
   add_images: True
