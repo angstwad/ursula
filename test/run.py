@@ -67,15 +67,10 @@ def timer(name=None):
             sys.stdout.flush()
 
 
-def popen(exec_str, stderr=subprocess.STDOUT, stdout=subprocess.PIPE,
-          wait=True):
-    process = subprocess.Popen(
+def popen(exec_str, stderr=subprocess.STDOUT, stdout=subprocess.PIPE):
+    return subprocess.Popen(
         exec_str, stderr=stderr, stdout=stdout, env=os.environ.copy()
     )
-    exitcode = None
-    if wait:
-        exitcode = process.wait()
-    return process, exitcode
 
 
 def ursula_single(playbook, args):
@@ -92,14 +87,15 @@ def ursula_single(playbook, args):
         print("Executing: '%s'" % exec_str)
         sys.stdout.flush()
 
-    process, exitcode = popen(shlex.split(exec_str), stderr=None, stdout=None)
+    process = popen(shlex.split(exec_str), stderr=None, stdout=None)
+    stdout, stderr = process.communicate()
 
-    if exitcode is not 0:
+    if process.poll() is not 0:
         print('\nPlaybook %s exited with errors, exit code: '
-              '%s\n' % (playbook, exitcode), file=sys.stderr)
+              '%s\n' % (playbook, process.returncode), file=sys.stderr)
         sys.stderr.flush()
 
-    return exitcode
+    return process.returncode
 
 
 def ursula_parallel(process_name, playbook, args):
@@ -124,29 +120,31 @@ def ursula_parallel(process_name, playbook, args):
         sys.stdout.flush()
 
     logfile = '%s.log' % playbook.split('.')[0]
-    process, exitcode = popen(shlex.split(exec_str), wait=False)
+    process = popen(shlex.split(exec_str))
+
+    stdout, stderr = process.communicate()
 
     f = open(logfile, 'wb')
     while True:
-        f.wite(process.stdout.read())
+        f.wite(stdout)
         if process.poll() is not None:
             break
         time.sleep(5)
     f.close()
 
-    if process.returncode is not 0:
+    if process.poll() is not 0:
         with lock:
             print("\nPlaybook '%s' exited with errors, exit code: "
-                  "%s\n" % (playbook, exitcode), file=sys.stderr)
+                  "%s\n" % (playbook, process.returncode), file=sys.stderr)
             sys.stderr.flush()
 
     with lock:
-        print(process.stdout.read())
-        if args.verbose and exitcode is 0:
+        print(stdout)
+        if args.verbose and process.returncode is 0:
             print("\nPlaybook '%s' complete.\n" % playbook)
         sys.stdout.flush()
 
-    sys.exit(exitcode)
+    sys.exit(process.returncode)
 
 
 def run_parallel(args):
