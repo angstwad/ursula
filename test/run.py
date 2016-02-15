@@ -191,15 +191,15 @@ def dispatch(args):
     if args.test:
         if args.verbose:
             print('Running test.')
-        ursula_single(TEST_PLAY, args.extra_ansible_args)
+        ursula_single(TEST_PLAY, args)
     elif args.cleanup:
         if args.verbose:
             print('Running cleanup.')
-        ursula_single(CLEANUP_PLAY, args.extra_ansible_args)
+        ursula_single(CLEANUP_PLAY, args)
     elif args.upgrade:
         if args.verbose:
             print('Running upgrade.')
-        ursula_single(UPGRADE_PLAY, args.extra_ansible_args)
+        ursula_single(UPGRADE_PLAY, args)
     elif args.deploy:
         if args.verbose:
             print('Running deploy.')
