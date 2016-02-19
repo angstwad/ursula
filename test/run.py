@@ -144,7 +144,7 @@ def ursula_parallel(process_name, playbook, args):
             print("\nPlaybook '%s' complete.\n" % playbook)
         sys.stdout.flush()
 
-    sys.exit(process.returncode)
+    return process.returncode
 
 
 def run_parallel(args):
@@ -154,12 +154,14 @@ def run_parallel(args):
 
     num_procs = args.workers if args.workers else len(PLAYS_PARALLEL)
     pool = multiprocessing.Pool(processes=num_procs)
+    results = []
     for idx, playbook in enumerate(PLAYS_PARALLEL):
         if args.verbose:
             print("Adding  '%s' to process pool." % playbook)
             sys.stdout.flush()
 
-        pool.apply_async(ursula_parallel, args=[idx, playbook, args])
+        result = pool.apply_async(ursula_parallel, args=[idx, playbook, args])
+        results.append(result)
 
     if args.verbose:
         print('All playbooks added to process pool.')
@@ -173,37 +175,49 @@ def run_parallel(args):
 
     pool.join()
 
+    results = [result.get(1) for result in results]
+    if any(results):
+        return 1
+    else:
+        return 0
+
 
 def run_deploy(args):
     for play in PLAYS_INITIAL:
         with timer('serial play %s' % play):
-            ursula_single(play, args)
+            rc = ursula_single(play, args)
+            if rc != 0:
+                return rc
 
     with timer('parallel Ursula deploy'):
-        run_parallel(args)
+        rc = run_parallel(args)
+        if rc != 0:
+            return rc
 
     for play in PLAYS_FINAL:
         with timer('serial play %s' % play):
-            ursula_single(play, args)
+            rc = ursula_single(play, args)
+            if rc != 0:
+                return rc
 
 
 def dispatch(args):
     if args.test:
         if args.verbose:
             print('Running test.')
-        ursula_single(TEST_PLAY, args)
+        sys.exit(ursula_single(TEST_PLAY, args))
     elif args.cleanup:
         if args.verbose:
             print('Running cleanup.')
-        ursula_single(CLEANUP_PLAY, args)
+        sys.exit(ursula_single(CLEANUP_PLAY, args))
     elif args.upgrade:
         if args.verbose:
             print('Running upgrade.')
-        ursula_single(UPGRADE_PLAY, args)
+        sys.exit(ursula_single(UPGRADE_PLAY, args))
     elif args.deploy:
         if args.verbose:
             print('Running deploy.')
-        run_deploy(args)
+            sys.exit(run_deploy(args))
 
 
 def parse_args():
