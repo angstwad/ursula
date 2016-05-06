@@ -109,6 +109,26 @@
   vars:
     ip_addr: "{{ fip.floating_ip.floating_ip_address }}"
 
+- name: run node_interconnectivity.yml
+  debug:
+    msg: Running node_interconnectivity.yml playbook
+
+# This checks connectivity for all nodes, but we're specifically checking internet
+# connectivity on nodes without floating_ip
+- name: cross-node inter-instance connectivity test
+  command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+           -o IdentityFile={{ temp_key_dest }}
+           cirros@{{ item.openstack.private_v4 }}
+           curl -IL --fail --connect-timeout 10 http://google.com"
+  become: no
+  changed_when: false
+  register: pings
+  until: pings|success
+  delay: 1
+  retries: 5
+  delegate_to: localhost
+  with_items: instances.results
+
 # Reboot checks
 - include: ha.yml
   # converged controllers; expression evaluates boolean true

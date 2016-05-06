@@ -1,6 +1,6 @@
 ---
 - name: check nova
-  shell: "curl -I --connect-timeout 2 http://127.0.0.1:{{ endpoints[item].port.backend_api }}{{ '/' + endpoints[item].version|default('') }}"
+  shell: "curl -I --connect-timeout 2 http://{{ ip_addr }}:{{ endpoints[item].port.backend_api }}{{ '/' + endpoints[item].version|default('') }}"
   with_items:
     - glance
     - keystone

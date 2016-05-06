@@ -3,15 +3,6 @@
   debug:
     msg: Running ha.yml playbook
 
-- name: remove previously allocated floating ip
-  os_floating_ip:
-    auth: "{{ auth }}"
-    network: external
-    server: "validate-{{ groups['compute'][0] }}"
-    floating_ip_address: "{{ fip.floating_ip.floating_ip_address }}"
-    state: absent
-  failed_when: false
-
 - name: add floating IPs to instances on controllers
   os_floating_ip:
     auth: "{{ auth }}"
@@ -72,6 +63,14 @@
 
 # Check API
 - include: api.yml
+  vars:
+    ip_addr: "{{ fip_controllers.results[0].floating_ip.floating_ip_address }}"
+  when: converged
+
+- include: api.yml
+  vars:
+    ip_addr: "{{ fip_compute.results[0].floating_ip.floating_ip_address }}"
+  when: not converged
 
 - include: converged.yml
   when: converged
