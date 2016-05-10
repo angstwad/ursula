@@ -66,6 +66,34 @@
   with_items: groups['compute']
   register: instances
 
+# Try to launch/schedule instances w/ alternate hypervisor hinting
+- name: delete failed instances
+  os_server:
+    auth: "{{ auth }}"
+    name: "{{ item.server.name }}"
+    state: absent
+    wait: yes
+  with_items: instances.results
+  when: instances|failed
+  tags: delete
+
+- name: relaunch instances
+  os_server:
+    auth: "{{ auth }}"
+    flavor: 1
+    image: cirros
+    key_name: validate
+    auto_floating_ip: no
+    security_groups: default,validate_ssh
+    nics:
+      - net-name: internal
+    name: "validate-{{ item }}"
+    availability_zone: "{{ hostvars[item]['compute_ag']|default('nova') }}:{{ item.split('.')[0] }}"
+    wait: yes
+  with_items: groups['compute']
+  register: instances
+  when: instances|failed
+
 - name: associate a floating ip
   os_floating_ip:
     auth: "{{ auth }}"
