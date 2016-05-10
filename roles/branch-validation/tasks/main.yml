@@ -65,6 +65,7 @@
     wait: yes
   with_items: groups['compute']
   register: instances
+  failed_when: false
 
 # Try to launch/schedule instances w/ alternate hypervisor hinting
 - name: delete failed instances
