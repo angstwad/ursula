@@ -161,7 +161,6 @@
   until: pings|success
   delay: 1
   retries: 5
-  delegate_to: localhost
   with_items: instances.results
 
 # Reboot checks
