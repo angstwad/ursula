@@ -172,7 +172,7 @@
 
 - include: ha.yml
   # dedicated controllers; expression evaluates boolean false
-  when: not groups['compute'] | intersect(groups['controller']) | length == 0
+  when: not (groups['compute'] | intersect(groups['controller']) | length == 0)
   vars:
     converged: no
 
