@@ -76,7 +76,6 @@
     wait: yes
   with_items: instances.results
   when: instances|failed
-  tags: delete
 
 - name: relaunch instances
   os_server:
@@ -144,7 +143,7 @@
 
 # This checks connectivity for all nodes, but we're specifically checking internet
 # connectivity on nodes without floating_ip
-- name: cross-node inter-instance connectivity test
+- name: checking internet connectivity on nodes without floating_ip
   command: "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
            -o IdentityFile={{ temp_key_dest }}
            cirros@{{ item.openstack.private_v4 }}
