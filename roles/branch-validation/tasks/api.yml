@@ -1,6 +1,6 @@
 ---
 - name: check nova
-  shell: "curl -I --connect-timeout 2 --fail {{ endpoints[item].url.public }} }} 2>&1"
+  shell: "curl -I --connect-timeout 2 --fail {{ endpoints[item].url.public }} 2>&1"
   with_items:
     - glance
     - keystone
