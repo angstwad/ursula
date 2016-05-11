@@ -59,7 +59,6 @@
     delay: 10
     timeout: 30
   delegate_to: "{{ groups['controller'][1] }}"
-  when: master
 
 # Check API
 - include: api.yml
