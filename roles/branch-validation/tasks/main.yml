@@ -49,6 +49,10 @@
       to_port: -1
       cidr: 0.0.0.0/0
       state: present
+    - ip_protocol: tcp
+      from_port: -1
+      to_port: "{{ endpoints['nova'].port.backend_api }}"
+      cidr: 0.0.0.0/0
 
 - name: launch instances
   os_server:
