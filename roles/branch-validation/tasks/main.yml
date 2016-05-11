@@ -39,6 +39,7 @@
     port_range_max: "{{ item.to_port }}"
     remote_ip_prefix: "{{ item.cidr }}"
     state: present
+  ignore_errors: yes
   with_items:
     - ip_protocol: tcp
       from_port: -1
