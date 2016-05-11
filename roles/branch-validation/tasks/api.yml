@@ -7,3 +7,4 @@
     - neutron
     - nova
   delegate_to: localhost
+  become: no
