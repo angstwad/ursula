@@ -6,3 +6,4 @@
     - keystone
     - neutron
     - nova
+  delegate_to: localhost
