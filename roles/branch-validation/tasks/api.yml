@@ -9,4 +9,4 @@
   register: curl
   delegate_to: localhost
   become: no
-  failed_when: "200 OK not in curl.stdout"
+  failed_when: '200 OK' not in curl.stdout
