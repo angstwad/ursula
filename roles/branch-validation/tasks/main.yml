@@ -51,7 +51,7 @@
       state: present
     - ip_protocol: tcp
       from_port: -1
-      to_port: "{{ endpoints['nova'].port.backend_api }}"
+      to_port: "{{ endpoints['nova'].port.backend_api }}" | int
       cidr: 0.0.0.0/0
 
 - name: launch instances
