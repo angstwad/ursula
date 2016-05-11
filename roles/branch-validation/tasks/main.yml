@@ -140,7 +140,7 @@
 - name: debug command
   debug: msg="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile={{ temp_key_dest }} cirros@{{ instances.results[0].openstack.private_v4 }} curl -IL --fail --connect-timeout 10 http://google.com"
 
-- name: persist private key
+- name: persist private key to controller
   become: no
   copy:
     content: "{{ keypair.key.private_key }}"
