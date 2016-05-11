@@ -1,10 +1,12 @@
 ---
 - name: check nova
-  shell: "curl -I --connect-timeout 2 {{ endpoints[item].url.public }} }}"
+  shell: "curl -I --connect-timeout 2 --fail {{ endpoints[item].url.public }} }} 2>&1"
   with_items:
     - glance
     - keystone
     - neutron
     - nova
+  register: curl
   delegate_to: localhost
   become: no
+  failed_when: "200 OK not in curl.stdout"
