@@ -140,13 +140,13 @@
 - name: debug command
   debug: msg="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile={{ temp_key_dest }} cirros@{{ instances.results[0].openstack.private_v4 }} curl -IL --fail --connect-timeout 10 http://google.com"
 
-  - name: persist private key
-    become: no
-    copy:
-      content: "{{ keypair.key.private_key }}"
-      dest: "{{ temp_key_dest }}"
-      mode: 0600
-    when: keypair|changed
+- name: persist private key
+  become: no
+  copy:
+    content: "{{ keypair.key.private_key }}"
+    dest: "{{ temp_key_dest }}"
+    mode: 0600
+  when: keypair|changed
 
 # This checks connectivity for all nodes, but we're specifically checking internet
 # connectivity on nodes without floating_ip
