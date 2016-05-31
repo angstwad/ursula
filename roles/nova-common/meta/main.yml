@@ -13,7 +13,7 @@ dependencies:
     service: nova
     logdata: "{{ nova.logs }}"
   - role: openstack-source
-    project_name: nova
+    project_name: "{{ project_name }}"
     project_rev: "{{ nova.source.rev }}"
     rootwrap: True
     alternatives: "{{ nova.alternatives }}"
@@ -21,7 +21,7 @@ dependencies:
     python_dependencies: "{{ nova.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: nova
+    project_name: "{{ project_name }}"
     rootwrap: True
     alternatives: "{{ nova.alternatives }}"
     when: openstack_install_method == 'package'

@@ -8,7 +8,7 @@ dependencies:
     service: cinder
     logdata: "{{ cinder.logs }}"
   - role: openstack-source
-    project_name: cinder
+    project_name: "{{ project_name }}"
     project_rev: "{{ cinder.source.rev }}"
     rootwrap: True
     alternatives: "{{ cinder.alternatives }}"
@@ -16,7 +16,7 @@ dependencies:
     python_dependencies: "{{ cinder.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: cinder
+    project_name: "{{ project_name }}"
     rootwrap: True
     alternatives: "{{ cinder.alternatives }}"
     when: openstack_install_method == 'package'

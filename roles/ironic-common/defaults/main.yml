@@ -1,4 +1,5 @@
 ---
+project_name: ironic
 ironic:
   virtualenv: /opt/stack/ironic
   path: /opt/stack/ironic

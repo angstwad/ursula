@@ -9,14 +9,14 @@ dependencies:
     service: keystone
     logdata: "{{ keystone.logs }}"
   - role: openstack-source
-    project_name: keystone
+    project_name: "{{ project_name }}"
     project_rev: "{{ keystone.source.rev }}"
     alternatives: "{{ keystone.alternatives }}"
     system_dependencies: "{{ keystone.source.system_dependencies }}"
     python_dependencies: "{{ keystone.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: keystone
+    project_name: "{{ project_name }}"
     alternatives: "{{ keystone.alternatives }}"
     when: openstack_install_method == 'package'
   - role: collectd-plugin

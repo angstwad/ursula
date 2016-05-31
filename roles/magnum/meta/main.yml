@@ -8,7 +8,7 @@ dependencies:
     service: magnum
     logdata: "{{ magnum.logs }}"
   - role: openstack-source
-    project_name: magnum
+    project_name: "{{ project_name }}"
     project_rev: "{{ magnum.source.rev }}"
     virtualenv: "{{ magnum.source.virtualenv }}"
     system_dependencies: "{{ magnum.source.system_dependencies }}"
@@ -16,7 +16,7 @@ dependencies:
     alternatives: "{{ magnum.alternatives }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: magnum
+    project_name: "{{ project_name }}"
     alternatives: "{{ magnum.alternatives }}"
     when: openstack_install_method == 'package'
   - role: collectd-plugin

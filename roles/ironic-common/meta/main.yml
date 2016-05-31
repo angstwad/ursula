@@ -6,7 +6,7 @@ dependencies:
     service: ironic
     logdata: "{{ ironic.logs }}"
   - role: openstack-source
-    project_name: ironic
+    project_name: "{{ project_name }}"
     project_rev: "{{ ironic.source.rev }}"
     rootwrap: True
     alternatives: "{{ ironic.alternatives }}"
@@ -14,6 +14,6 @@ dependencies:
     python_dependencies: "{{ ironic.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: ironic
+    project_name: "{{ project_name }}"
     alternatives: "{{ ironic.alternatives }}"
     when: openstack_install_method == 'package'

@@ -8,14 +8,14 @@ dependencies:
     service: horizon
     logdata: "{{ horizon.logs }}"
   - role: openstack-source
-    project_name: horizon
+    project_name: "{{ project_name }}"
     project_rev: "{{ horizon.source.rev }}"
     system_dependencies: "{{ horizon.source.system_dependencies }}"
     python_dependencies: "{{ horizon.source.python_dependencies }}"
     additional_handlers: [ "compress horizon assets" ]
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: horizon
+    project_name: "{{ project_name }}"
     when: openstack_install_method == 'package'
   - role: apache
   - role: keystone-defaults

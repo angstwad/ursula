@@ -8,14 +8,14 @@ dependencies:
     service: heat
     logdata: "{{ heat.logs }}"
   - role: openstack-source
-    project_name: heat
+    project_name: "{{ project_name }}"
     project_rev: "{{ heat.source.rev }}"
     alternatives: "{{ heat.alternatives }}"
     system_dependencies: "{{ heat.source.system_dependencies }}"
     python_dependencies: "{{ heat.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: heat
+    project_name: "{{ project_name }}"
     alternatives: "{{ heat.alternatives }}"
     when: openstack_install_method == 'package'
   - role: openstack-database

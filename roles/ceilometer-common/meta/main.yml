@@ -8,12 +8,12 @@ dependencies:
     service: ceilometer
     logdata: "{{ ceilometer.logs }}"
   - role: openstack-source
-    project_name: ceilometer
+    project_name: "{{ project_name }}"
     project_rev: "{{ ceilometer.source.rev }}"
     alternatives: "{{ ceilometer.alternatives }}"
     python_dependencies: "{{ ceilometer.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: ceilometer
+    project_name: "{{ project_name }}"
     alternatives: "{{ ceilometer.alternatives }}"
     when: openstack_install_method == 'package'

@@ -9,7 +9,7 @@ dependencies:
     service: neutron
     logdata: "{{ neutron.logs }}"
   - role: openstack-source
-    project_name: neutron
+    project_name: "{{ project_name }}"
     project_rev: "{{ neutron.source.rev }}"
     rootwrap: True
     alternatives: "{{ neutron.alternatives }}"
@@ -17,7 +17,7 @@ dependencies:
     python_dependencies: "{{ neutron.source.python_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: neutron
+    project_name: "{{ project_name }}"
     rootwrap: True
     alternatives: "{{ neutron.alternatives }}"
     when: openstack_install_method == 'package'

@@ -8,13 +8,13 @@ dependencies:
     service: swift
     logdata: "{{ swift.logs }}"
   - role: openstack-source
-    project_name: swift
+    project_name: "{{ project_name }}"
     python_dependencies: "{{ swift.source.python_dependencies }}"
     system_dependencies: "{{ swift.source.system_dependencies }}"
     project_rev: "{{ swift.source.rev }}"
     alternatives: "{{ swift.alternatives }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
-    project_name: swift
+    project_name: "{{ project_name }}"
     alternatives: "{{ swift.alternatives }}"
     when: openstack_install_method == 'package'
