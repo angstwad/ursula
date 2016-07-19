@@ -55,7 +55,8 @@
       password: "{{ secrets.admin_password }}"
   with_items: "{{ keystone.users }}"
   # If cloud_admin already exists, don't set the cloud_admin user/pass (overwriting existing userpass)
-  when: "item.name != 'cloud_admin' or (item.name == 'cloud_admin' and 'cloud_admin' not in user_facts.ansible_facts.openstack_users|map(attribute='username')|list)"
+  when: "item.name not in ['cloud_admin', 'monitor'] or
+         (item.name in ['cloud_admin', 'monitor'] and item.name not in user_facts.ansible_facts.openstack_users|map(attribute='username')|list)"
 
 - name: keystone roles
   environment:
