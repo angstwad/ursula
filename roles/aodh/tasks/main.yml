@@ -12,7 +12,7 @@
 - name: create aodh cache dir
   file: dest=/var/cache/aodh state=directory mode=0700
         owner=aodh group=aodh
-        
+
 - name: permit access to aodh
   ufw: rule=allow to_port={{ endpoints.aodh.port.haproxy_api }} proto=tcp
   tags: ufw
@@ -27,7 +27,7 @@
     - aodh-evaluator
     - aodh-listener
     - aodh-notifier
-    
+
 - name: aodh config
   template: src={{ item }} dest=/etc/aodh/
             mode={{ 0644 if 'policy.json' in item else 0640 }}
@@ -35,7 +35,7 @@
   with_fileglob: ../templates/etc/aodh/*
   notify:
     - restart aodh services
-    
+
 - name: stop aodh services before db sync
   service: name={{ item }} state=stopped
   when: database_create.changed or force_sync|default('false')|bool
@@ -65,7 +65,7 @@
         upgrade | default('False') | bool
 
 - meta: flush_handlers
-    
+
 - name: start aodh services
   service: name={{ item }} state=started
   with_items:
@@ -81,7 +81,7 @@
   service:
     name: aodhi-expirer
     state: stopped
-    must_exist: false
+  failed_when: false
 
 - name: uninstall aodh-expirer services
   upstart_service: name={{ item }}

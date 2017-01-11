@@ -1,9 +1,11 @@
 ---
 - name: restart apache
-  service: name=apache2 state=restarted must_exist=false
+  service: name=apache2 state=restarted
+  failed_when: false
 
 - name: reload apache
-  service: name=apache2 state=reloaded must_exist=false
+  service: name=apache2 state=reloaded
+  failed_when: false
 
 - name: stop apache
   service: name=apache2 state=stopped

@@ -1,6 +1,7 @@
 ---
 - name: restart ceilometer services
-  service: name={{ item }} state=restarted must_exist=false
+  service: name={{ item }} state=restarted
+  failed_when: false
   when: restart|default('True')
   with_items:
     - ceilometer-api

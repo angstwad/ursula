@@ -195,7 +195,6 @@
     - role: stop-services
       services:
         - ceilometer-agent-compute
-      must_exist: False
       when: ceilometer.enabled|bool
   environment: "{{ env_vars|default({}) }}"
 
@@ -222,7 +221,6 @@
         - ceilometer-agent-central
         - ceilometer-alarm-evaluator
         - ceilometer-alarm-notifier
-      must_exist: False
       when: ceilometer.enabled|bool
 
     - role: ceilometer-control
@@ -351,7 +349,6 @@
     - role: stop-services
       services:
         - nova-cert
-      must_exist: False
 
     - role: nova-control
       force_sync: true

@@ -22,7 +22,8 @@
       user: name=nova comment=nova shell=/bin/sh home=/var/lib/nova createhome=yes
 
     - name: start nova services
-      service: name={{ item }} state=restarted must_exist=false
+      service: name={{ item }} state=restarted
+      failed_when: false
       with_items:
         - nova-api
         - nova-consoleauth

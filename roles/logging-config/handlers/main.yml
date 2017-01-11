@@ -1,3 +1,4 @@
 ---
 - name: restart logstash-forwarder
-  service: name=logstash-forwarder state=restarted must_exist=false
+  service: name=logstash-forwarder state=restarted
+  failed_when: false

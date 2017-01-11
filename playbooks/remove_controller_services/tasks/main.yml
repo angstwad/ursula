@@ -76,7 +76,7 @@
       tags: controller_services
 
     - name: stop and remove controller services
-      service: name={{ item }} state=stopped enabled=false must_exist=false
+      service: name={{ item }} state=stopped enabled=false
       with_items: "{{ service_list }}"
       failed_when: false
       tags: controller_services
@@ -122,7 +122,7 @@
     - name: remove percona packages
       apt: pkg="percona-*" purge=yes state=absent
       failed_when: false
-      tags: percona    
+      tags: percona
 
     - name: remove the percona backup script
       file: path=/etc/cron.daily/percona-xtrabackup state=absent

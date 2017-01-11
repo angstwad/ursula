@@ -4,7 +4,7 @@
   service:
     name: keystone
     state: restarted
-    must_exist: false
+  failed_when: false
   run_once: True
   delegate_to: "{{ item }}"
   when: restart|default('True')
