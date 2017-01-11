@@ -1,6 +1,6 @@
 ---
 - name: restart neutron services
-  service: name={{ item }} state=restarted_if_running must_exist=false
+  service: name={{ item }} state=restarted must_exist=false
   when: restart|default('True')
   with_items:
     - neutron-server
