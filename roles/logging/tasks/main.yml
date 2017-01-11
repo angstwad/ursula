@@ -17,7 +17,7 @@
 - name: stop logstash-forwarder service
   service: name=logstash-forwarder state=stopped enabled=yes
   register: lsfstop
-  failed_when: lsfstop|failed and ("service not found" not in lsfstop.msg)
+  failed_when: lsfstop|failed and ("no service or tool found for" not in lsfstop.msg)
 
 - name: download logstash
   get_url: url={{ logging.download.url }}

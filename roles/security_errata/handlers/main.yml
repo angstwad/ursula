@@ -2,4 +2,4 @@
 - name: reload haproxy
   service: name=haproxy state=reloaded must_exist=false
   register: hareload
-  failed_when: hareload|failed and ("service not found" not in hareload.msg)
+  failed_when: hareload|failed and ("no service or tool found" not in hareload.msg)

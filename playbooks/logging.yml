@@ -7,7 +7,7 @@
     - name: stop logstash-forwarder service
       service: name=logstash-forwarder state=stopped enabled=yes
       register: lsfstop
-      failed_when: lsfstop|failed and ("service not found" not in lsfstop.msg)
+      failed_when: lsfstop|failed and ("no service or tool found for" not in lsfstop.msg)
     - include: ../roles/cleanup/tasks/logging.yml
 
 - name: install or update logstash-forwarder
